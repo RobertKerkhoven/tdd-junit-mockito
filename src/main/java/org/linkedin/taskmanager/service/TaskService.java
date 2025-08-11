@@ -5,6 +5,8 @@ import org.linkedin.taskmanager.model.Task;
 import org.linkedin.taskmanager.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TaskService {
 
@@ -14,6 +16,11 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
+
+
     public Task updateTaskStatus(long id, String status) {
         Task task = getTaskById(id);
         task.setStatus(status);
@@ -22,5 +29,9 @@ public class TaskService {
 
     public Task getTaskById(long id) {
         return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task not found, id: "+id));
+    }
+
+    public Task createTask(Task task) {
+        return taskRepository.save(task);
     }
 }
