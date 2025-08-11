@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,5 +46,32 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].title").value("Task 1"))
                 .andExpect(jsonPath("$[1].title").value("Task 2"));
+    }
+
+    @Test
+    void testCreateTask() throws Exception {
+        //arrange
+        Task task = new Task(1L, "Controller test task", "To do");
+
+        when(taskService.createTask(any(Task.class))).thenReturn(task);
+
+        //act & assert
+        mockMvc.perform(post("/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Controller test task"));
+    }
+
+    @Test
+    void testCreateTask_InvalidTitle() throws Exception {
+        //arrange
+        Task task = new Task(1L, "", "To do");
+
+        // act & assert
+        mockMvc.perform(post("/tasks")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -1,11 +1,10 @@
 package org.linkedin.taskmanager.controller;
 
+import jakarta.validation.Valid;
 import org.linkedin.taskmanager.model.Task;
 import org.linkedin.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,7 +17,11 @@ public class TaskController {
 
     @GetMapping
     public List<Task> getAllTasks() {
-        List<Task> tasks = taskService.getAllTasks();
-        return tasks;
+        return taskService.getAllTasks();
+    }
+
+    @PostMapping
+    public Task createTask(@Valid Task taskData) {
+        return taskService.createTask(taskData);
     }
 }
