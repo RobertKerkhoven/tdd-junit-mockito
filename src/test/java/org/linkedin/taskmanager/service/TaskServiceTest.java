@@ -2,6 +2,7 @@ package org.linkedin.taskmanager.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.linkedin.taskmanager.exception.TaskNotFoundException;
 import org.linkedin.taskmanager.model.Task;
 import org.linkedin.taskmanager.repository.TaskRepository;
 import org.mockito.InjectMocks;
@@ -27,6 +28,17 @@ public class TaskServiceTest {
 //    public void setup() {
 //        MockitoAnnotations.openMocks(this);
 //    }
+
+    @Test
+    void testGetTaskById_TaskNotFound() {
+        // arrange
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+
+
+        // act & assert
+        assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById(1L));
+        verify(taskRepository, times(1)).findById(1L);
+    }
 
     @Test
     void testUpdateTaskStatus() {
