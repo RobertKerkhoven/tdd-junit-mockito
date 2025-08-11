@@ -101,4 +101,27 @@ public class TaskServiceTest {
         verify(taskRepository, times(1)).save(task);
     }
 
+    @Test
+    void testDeleteTask() {
+        //arrange
+        Task existingTask = new Task(1L,"Existing task","To do");
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(existingTask));
+        //act
+        taskService.deleteTask(1L);
+
+        //assert
+        verify(taskRepository).delete(existingTask);
+        verify(taskRepository).findById(1L);
+
+    }
+
+    @Test
+    void testDeleteTask_TaskNotFound() {
+        //arrange
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+        // act & assert
+        assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(1L));
+        verify(taskRepository, times(1)).findById(1L);
+    }
+
 }
