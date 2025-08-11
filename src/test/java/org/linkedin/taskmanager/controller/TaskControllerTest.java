@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -74,4 +76,36 @@ public class TaskControllerTest {
                     .content(objectMapper.writeValueAsString(task)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void testGetTaskById() throws Exception {
+        Task task = new Task(1L, "Task 1", "To do");
+
+        when(taskService.getTaskById(1L)).thenReturn(task);
+
+        mockMvc.perform(get("/tasks/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Task 1"))
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    @Test
+    void testUpdateTask() throws Exception {
+        Task updatedTask = new Task(1L, "Updated task", "In progress");
+        when(taskService.updateTask(eq(1L), any(Task.class))).thenReturn(updatedTask);
+
+        String taskJson = objectMapper.writeValueAsString(updatedTask);
+
+        //act & assert
+        mockMvc.perform(put("/tasks/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(taskJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated task"))
+                .andExpect(jsonPath("$.id").value(1));
+
+        verify(taskService).updateTask(eq(1L), any(Task.class));
+    }
+
 }
