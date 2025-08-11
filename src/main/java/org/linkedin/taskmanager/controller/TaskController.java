@@ -1,9 +1,11 @@
 package org.linkedin.taskmanager.controller;
 
 import jakarta.validation.Valid;
+import org.linkedin.taskmanager.exception.TaskNotFoundException;
 import org.linkedin.taskmanager.model.Task;
 import org.linkedin.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,5 +41,18 @@ public class TaskController {
         Task updatedTask = taskService.updateTask(id, taskData);
         return ResponseEntity.ok(updatedTask);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<String> handleTaskNotFoundException(TaskNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
 
 }

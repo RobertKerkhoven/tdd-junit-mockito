@@ -2,6 +2,7 @@ package org.linkedin.taskmanager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.linkedin.taskmanager.exception.TaskNotFoundException;
 import org.linkedin.taskmanager.model.Task;
 import org.linkedin.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,6 +78,16 @@ public class TaskControllerTest {
     }
 
     @Test
+    void testGetTaskById_TaskNotFound() throws Exception {
+        //arrange
+        when(taskService.getTaskById(1L)).thenThrow(new TaskNotFoundException("Task Not Found"));
+        //act & assert
+        mockMvc.perform(get("/tasks/1"))
+                .andExpect(status().isNotFound());
+        verify(taskService, times(1)).getTaskById(1L);
+    }
+
+    @Test
     void testGetTaskById() throws Exception {
         Task task = new Task(1L, "Task 1", "To do");
 
@@ -106,6 +116,16 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.id").value(1));
 
         verify(taskService).updateTask(eq(1L), any(Task.class));
+    }
+
+    @Test
+    void testDeleteTask() throws Exception {
+        //arrange
+        doNothing().when(taskService).deleteTask(eq(1L));
+        //act & assert
+        mockMvc.perform(delete("/tasks/1"))
+                .andExpect(status().isNoContent());
+        verify(taskService).deleteTask(eq(1L));
     }
 
 }
