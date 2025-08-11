@@ -20,7 +20,6 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-
     public Task updateTaskStatus(long id, String status) {
         Task task = getTaskById(id);
         task.setStatus(status);
@@ -38,5 +37,12 @@ public class TaskService {
     public void deleteTask(long id) {
         Task taskToDelete = getTaskById(id);
         taskRepository.delete(taskToDelete);
+    }
+
+    public Task updateTask(Long l, Task taskData) {
+        Task taskToUpdate = getTaskById(l);
+        taskToUpdate.setTitle(taskData.getTitle());
+        taskToUpdate.setStatus(taskData.getStatus());
+        return taskRepository.save(taskToUpdate);
     }
 }

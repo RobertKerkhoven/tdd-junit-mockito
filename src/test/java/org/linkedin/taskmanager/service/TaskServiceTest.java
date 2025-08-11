@@ -102,6 +102,25 @@ public class TaskServiceTest {
     }
 
     @Test
+    void testUpdateTask() {
+        //arrange
+        Task existingTask = new Task(1L,"Existing task","To do");
+        Task updatedTaskData = new Task(1L,"Updated task","Done");
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(existingTask));
+        //when(taskRepository.save(any(Task.class))).thenReturn(updatedTaskData);
+        when(taskRepository.save(any(Task.class))).thenAnswer(i -> i.getArgument(0));
+
+        //act
+        Task updatedTask = taskService.updateTask(1L, updatedTaskData);
+        //assert
+        assertNotNull(updatedTask);
+        assertEquals("Updated task", updatedTask.getTitle());
+        assertEquals("Done", updatedTask.getStatus());
+        verify(taskRepository, times(1)).save(existingTask) ;
+    }
+
+    @Test
     void testDeleteTask() {
         //arrange
         Task existingTask = new Task(1L,"Existing task","To do");
